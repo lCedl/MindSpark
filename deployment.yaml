@@ -1,0 +1,6 @@
+containers:
+- name: mindspark
+  image: mindspark-nginx
+  ports:
+  - containerPort: 80
+  - nodePort: 30007

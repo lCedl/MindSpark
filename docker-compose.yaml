@@ -1,21 +1,2 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: MindSpark
-  labels:
-    app: MindSpark
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: MindSpark
-      template:
-        metadata:
-         labels:
-          app: MindSpark
-        spec:
-          containers:
-          - name: MindSpark
-            image: nginx:1.7.9
-            ports:
-            - containerPort: 80
+FROM nginx:latest
+COPY friontend /home/cedric/SOURCE/MindSpark/frontend/index.html
