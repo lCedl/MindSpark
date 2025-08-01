@@ -1,6 +1,51 @@
-@backend_HostAddress = http://localhost:5163
+@backend_HostAddress = https://localhost:7001
 
-GET {{backend_HostAddress}}/weatherforecast/
+### Generate a new quiz
+POST {{backend_HostAddress}}/api/quiz/generate
+Content-Type: application/json
+
+{
+  "topic": "World History",
+  "numberOfQuestions": 5
+}
+
+###
+
+### Get a specific quiz
+GET {{backend_HostAddress}}/api/quiz/1
+Accept: application/json
+
+###
+
+### Submit quiz answers
+POST {{backend_HostAddress}}/api/quiz/submit
+Content-Type: application/json
+
+{
+  "quizId": 1,
+  "playerName": "John Doe",
+  "answers": [
+    {
+      "questionId": 1,
+      "selectedAnswerId": 2
+    },
+    {
+      "questionId": 2,
+      "selectedAnswerId": 1
+    }
+  ]
+}
+
+###
+
+### Get quiz results
+GET {{backend_HostAddress}}/api/quiz/results/1
+Accept: application/json
+
+###
+
+### Get list of recent quizzes
+GET {{backend_HostAddress}}/api/quiz/list
 Accept: application/json
 
 ###

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
+using Backend.Services;
 
 namespace backend;
 
@@ -11,6 +12,21 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
+        
+        // Add CORS for frontend
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                policy.WithOrigins("http://localhost:5000", "http://127.0.0.1:5000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
+
+        // Add HttpClient for OpenAI API
+        builder.Services.AddHttpClient<IOpenAIService, OpenAIService>();
+
         builder.Services.AddDbContext<BackendContext>(opt =>
         {
             opt.UseInMemoryDatabase("BackendDatabase");
@@ -30,8 +46,10 @@ public class Program
 
         app.UseHttpsRedirection();
 
-        app.UseAuthorization();
+        // Use CORS
+        app.UseCors("AllowFrontend");
 
+        app.UseAuthorization();
 
         app.MapControllers();
 

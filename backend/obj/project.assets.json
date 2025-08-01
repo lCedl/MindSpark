@@ -8360,24 +8360,31 @@
     ]
   },
   "packageFolders": {
-    "/home/cedric/.nuget/packages/": {}
+    "C:\\Users\\cedri\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/cedric/SOURCE/MindSpark/backend/backend.csproj",
+      "projectUniqueName": "H:\\Projekte\\MindSpark\\backend\\backend.csproj",
       "projectName": "backend",
-      "projectPath": "/home/cedric/SOURCE/MindSpark/backend/backend.csproj",
-      "packagesPath": "/home/cedric/.nuget/packages/",
-      "outputPath": "/home/cedric/SOURCE/MindSpark/backend/obj/",
+      "projectPath": "H:\\Projekte\\MindSpark\\backend\\backend.csproj",
+      "packagesPath": "C:\\Users\\cedri\\.nuget\\packages\\",
+      "outputPath": "H:\\Projekte\\MindSpark\\backend\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/cedric/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\cedri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -8396,7 +8403,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net9.0": {
@@ -8454,7 +8461,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/cedric/.dotnet/sdk/9.0.303/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

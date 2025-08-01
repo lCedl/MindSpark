@@ -2,13 +2,278 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - MindSpark</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .quiz-content {
+            padding: 2rem;
+        }
+
+        .question {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .answers {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .answer-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .answer-option input[type="radio"] {
+            margin-right: 1rem;
+            transform: scale(1.2);
+        }
+
+        .answer-option input[type="radio"]:checked + label {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .answer-option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .player-name-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border: 2px solid #e1e5e9;
+        }
+
+        .player-name-section label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .player-name-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .player-name-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e1e5e9;
+            border-radius: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+    </style>
 </head>
 <body>
-    <h1>Quiz: {{ topic }}</h1>
-    <p>Number of Questions: {{ num_questions }}</p>
-    <!-- Questions will be displayed here -->
-    <p>Quiz functionality coming soon!</p>
-    <a href="/">Back</a>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 MindSpark Quiz</h1>
+            <p>{{ quiz.topic }} • {{ quiz.numberOfQuestions }} Questions</p>
+        </div>
+
+        <div class="quiz-content">
+            <form method="post" action="/submit_quiz" id="quizForm">
+                <div class="player-name-section">
+                    <label for="player_name">Your Name:</label>
+                    <input type="text" id="player_name" name="player_name" placeholder="Enter your name..." required>
+                </div>
+
+                {% for question in quiz.questions %}
+                <div class="question">
+                    <div class="question-number">Question {{ loop.index }}</div>
+                    <div class="question-text">{{ question.questionText }}</div>
+                    
+                    <div class="answers">
+                        {% for answer in question.answers %}
+                        <div class="answer-option">
+                            <input type="radio" 
+                                   id="q{{ question.id }}_a{{ answer.id }}" 
+                                   name="question_{{ question.id }}" 
+                                   value="{{ answer.id }}" 
+                                   required>
+                            <label for="q{{ question.id }}_a{{ answer.id }}">
+                                {{ answer.answerText }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn" id="submitBtn">📊 Submit Quiz</button>
+                    <br>
+                    <a href="/" class="back-link">← Back to Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Form validation
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            const playerName = document.getElementById('player_name').value.trim();
+            if (!playerName) {
+                e.preventDefault();
+                alert('Please enter your name.');
+                return;
+            }
+
+            const questions = document.querySelectorAll('.question');
+            let answeredQuestions = 0;
+            
+            questions.forEach(question => {
+                const radioButtons = question.querySelectorAll('input[type="radio"]');
+                const isAnswered = Array.from(radioButtons).some(radio => radio.checked);
+                if (isAnswered) answeredQuestions++;
+            });
+
+            if (answeredQuestions < questions.length) {
+                e.preventDefault();
+                alert(`Please answer all questions. You've answered ${answeredQuestions} out of ${questions.length} questions.`);
+                return;
+            }
+        });
+
+        // Real-time validation
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const question = this.closest('.question');
+                const radioButtons = question.querySelectorAll('input[type="radio"]');
+                const isAnswered = Array.from(radioButtons).some(radio => radio.checked);
+                
+                if (isAnswered) {
+                    question.style.borderColor = '#667eea';
+                    question.style.background = '#f8f9ff';
+                }
+            });
+        });
+    </script>
 </body>
 </html> 

@@ -1,12 +1,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mindspark-service
+  name: mindspark-backend-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
-    app: mindspark
+    app: mindspark-backend
+  ports:
+  - port: 7001
+    targetPort: 7001
+    protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mindspark-frontend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: mindspark-frontend
   ports:
   - port: 80
-    targetPort: 80
-    nodePort: 30007  # You can pick a port between 30000-32767
+    targetPort: 5000
+    protocol: TCP
