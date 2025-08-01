@@ -21,6 +21,7 @@ secrets.yml
 .env.test
 
 # Configuration files with sensitive data
+appsettings.json
 appsettings.Production.json
 appsettings.Staging.json
 appsettings.Development.json
