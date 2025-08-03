@@ -42,6 +42,18 @@ public class QuizController : ControllerBase
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync();
 
+            // Now that we have the actual IDs, update the CorrectAnswerId for each question
+            foreach (var question in quiz.Questions)
+            {
+                if (question.CorrectAnswerId >= 0 && question.CorrectAnswerId < question.Answers.Count)
+                {
+                    var correctAnswer = question.Answers[question.CorrectAnswerId];
+                    question.CorrectAnswerId = correctAnswer.Id;
+                }
+            }
+            
+            await _context.SaveChangesAsync();
+
             // Return response without correct answers
             var response = new QuizResponse
             {
@@ -96,6 +108,7 @@ public class QuizController : ControllerBase
             {
                 Id = q.Id,
                 QuestionText = q.QuestionText,
+                CorrectAnswerId = q.CorrectAnswerId, // Include correct answer ID for review
                 Answers = q.Answers.Select(a => new AnswerResponse
                 {
                     Id = a.Id,
@@ -209,5 +222,34 @@ public class QuizController : ControllerBase
         }).ToList();
 
         return Ok(response);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteQuiz(int id)
+    {
+        try
+        {
+            var quiz = await _context.Quizzes
+                .Include(q => q.Questions)
+                .ThenInclude(q => q.Answers)
+                .Include(q => q.Results)
+                .FirstOrDefaultAsync(q => q.Id == id);
+
+            if (quiz == null)
+            {
+                return NotFound("Quiz not found");
+            }
+
+            // Delete related data (Entity Framework will handle cascading)
+            _context.Quizzes.Remove(quiz);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Quiz deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting quiz");
+            return StatusCode(500, "Error deleting quiz. Please try again.");
+        }
     }
 } 

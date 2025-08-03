@@ -113,5 +113,49 @@ def quiz_list():
     except requests.exceptions.RequestException as e:
         return render_template('quiz_list.html', quizzes=[], error="Unable to connect to backend service")
 
+@app.route('/quiz/<int:quiz_id>')
+def take_quiz(quiz_id):
+    try:
+        response = requests.get(f"{BACKEND_URL}/api/quiz/{quiz_id}")
+        if response.status_code == 200:
+            quiz_data = response.json()
+            session['current_quiz'] = quiz_data
+            return render_template('quiz.html', quiz=quiz_data)
+        else:
+            return render_template('index.html', error="Quiz not found")
+    except requests.exceptions.RequestException as e:
+        return render_template('index.html', error="Unable to connect to backend service")
+
+@app.route('/quiz/<int:quiz_id>/review')
+def review_quiz(quiz_id):
+    try:
+        # Get the quiz data
+        quiz_response = requests.get(f"{BACKEND_URL}/api/quiz/{quiz_id}")
+        if quiz_response.status_code != 200:
+            return render_template('index.html', error="Quiz not found")
+        
+        quiz_data = quiz_response.json()
+        
+        # Get quiz results
+        results_response = requests.get(f"{BACKEND_URL}/api/quiz/results/{quiz_id}")
+        results = []
+        if results_response.status_code == 200:
+            results = results_response.json()
+        
+        return render_template('quiz_review.html', quiz=quiz_data, results=results)
+    except requests.exceptions.RequestException as e:
+        return render_template('index.html', error="Unable to connect to backend service")
+
+@app.route('/delete_quiz/<int:quiz_id>', methods=['DELETE'])
+def delete_quiz(quiz_id):
+    try:
+        response = requests.delete(f"{BACKEND_URL}/api/quiz/{quiz_id}")
+        if response.status_code == 200:
+            return jsonify({"message": "Quiz deleted successfully"}), 200
+        else:
+            return jsonify({"error": "Failed to delete quiz"}), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": "Unable to connect to backend service"}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 

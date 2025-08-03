@@ -29,7 +29,7 @@ public class Program
 
         builder.Services.AddDbContext<BackendContext>(opt =>
         {
-            opt.UseInMemoryDatabase("BackendDatabase");
+            opt.UseSqlite("Data Source=./sqlite/mindspark.db");
         });
 
         var app = builder.Build();

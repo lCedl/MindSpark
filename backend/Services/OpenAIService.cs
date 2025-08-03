@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Backend.Models;
 
 namespace Backend.Services;
@@ -53,6 +54,7 @@ public class OpenAIService : IOpenAIService
         {
             model = "gpt-3.5-turbo",
             messages = new[]
+            
             {
                 new { role = "system", content = "You are a helpful assistant that creates educational quizzes. Always respond with valid JSON in the exact format requested." },
                 new { role = "user", content = prompt }
@@ -100,19 +102,35 @@ public class OpenAIService : IOpenAIService
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation($"OpenAI Response: {responseContent}");
+                
                 var openAIResponse = JsonSerializer.Deserialize<OpenAIResponse>(responseContent);
-
+                _logger.LogInformation($"Deserialized OpenAI Response - Choices Count: {openAIResponse?.Choices?.Count ?? 0}");
+                
                 if (openAIResponse?.Choices?.FirstOrDefault()?.Message?.Content == null)
                 {
-                    throw new Exception("Invalid response from OpenAI API");
+                    _logger.LogError($"Invalid OpenAI response structure. Response: {responseContent}");
+                    throw new Exception($"Invalid response from OpenAI API. Response structure: {responseContent}");
                 }
 
                 var quizJson = openAIResponse.Choices[0].Message.Content;
-                var quizData = JsonSerializer.Deserialize<OpenAIQuizResponse>(quizJson);
-
-                if (quizData?.Questions == null)
+                _logger.LogInformation($"Quiz JSON from OpenAI: {quizJson}");
+                
+                OpenAIQuizResponse quizData;
+                try
                 {
-                    throw new Exception("Failed to parse quiz data from OpenAI response");
+                    quizData = JsonSerializer.Deserialize<OpenAIQuizResponse>(quizJson);
+
+                    if (quizData?.Questions == null)
+                    {
+                        _logger.LogError($"Failed to parse quiz data. Quiz JSON: {quizJson}");
+                        throw new Exception($"Failed to parse quiz data from OpenAI response. Quiz JSON: {quizJson}");
+                    }
+                }
+                catch (JsonException ex)
+                {
+                    _logger.LogError(ex, $"JSON parsing error for quiz data. Quiz JSON: {quizJson}");
+                    throw new Exception($"Failed to parse quiz JSON from OpenAI response: {ex.Message}. Quiz JSON: {quizJson}");
                 }
 
                 // Convert to our domain model
@@ -132,6 +150,8 @@ public class OpenAIService : IOpenAIService
                         Answers = new List<Answer>()
                     };
 
+                    // Add all answers and track which one is correct
+                    int correctAnswerIndex = -1;
                     for (int i = 0; i < questionData.Answers.Count; i++)
                     {
                         var answer = new Answer
@@ -142,9 +162,13 @@ public class OpenAIService : IOpenAIService
 
                         if (questionData.Answers[i].IsCorrect)
                         {
-                            question.CorrectAnswerId = answer.Id;
+                            correctAnswerIndex = i;
                         }
                     }
+
+                    // Store the correct answer index for later processing
+                    // We'll set the CorrectAnswerId after saving to get the actual IDs
+                    question.CorrectAnswerId = correctAnswerIndex;
 
                     quiz.Questions.Add(question);
                 }
@@ -170,32 +194,87 @@ public class OpenAIService : IOpenAIService
 // OpenAI API response models
 public class OpenAIResponse
 {
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = string.Empty;
+    
+    [JsonPropertyName("object")]
+    public string Object { get; set; } = string.Empty;
+    
+    [JsonPropertyName("created")]
+    public long Created { get; set; }
+    
+    [JsonPropertyName("model")]
+    public string Model { get; set; } = string.Empty;
+    
+    [JsonPropertyName("choices")]
     public List<OpenAIChoice> Choices { get; set; } = new();
+    
+    [JsonPropertyName("usage")]
+    public OpenAIUsage Usage { get; set; } = new();
 }
 
 public class OpenAIChoice
 {
+    [JsonPropertyName("index")]
+    public int Index { get; set; }
+    
+    [JsonPropertyName("message")]
     public OpenAIMessage Message { get; set; } = new();
+    
+    [JsonPropertyName("logprobs")]
+    public object? Logprobs { get; set; }
+    
+    [JsonPropertyName("finish_reason")]
+    public string FinishReason { get; set; } = string.Empty;
 }
 
 public class OpenAIMessage
 {
+    [JsonPropertyName("role")]
+    public string Role { get; set; } = string.Empty;
+    
+    [JsonPropertyName("content")]
     public string Content { get; set; } = string.Empty;
+    
+    [JsonPropertyName("refusal")]
+    public object? Refusal { get; set; }
+    
+    [JsonPropertyName("annotations")]
+    public List<object> Annotations { get; set; } = new();
+}
+
+public class OpenAIUsage
+{
+    [JsonPropertyName("prompt_tokens")]
+    public int PromptTokens { get; set; }
+    
+    [JsonPropertyName("completion_tokens")]
+    public int CompletionTokens { get; set; }
+    
+    [JsonPropertyName("total_tokens")]
+    public int TotalTokens { get; set; }
 }
 
 public class OpenAIQuizResponse
 {
+    [JsonPropertyName("questions")]
     public List<OpenAIQuestion> Questions { get; set; } = new();
 }
 
 public class OpenAIQuestion
 {
+    [JsonPropertyName("question")]
     public string Question { get; set; } = string.Empty;
+    
+    [JsonPropertyName("answers")]
     public List<OpenAIAnswer> Answers { get; set; } = new();
 }
 
 public class OpenAIAnswer
 {
+    [JsonPropertyName("text")]
     public string Text { get; set; } = string.Empty;
+    
+    [JsonPropertyName("isCorrect")]
     public bool IsCorrect { get; set; }
 } 

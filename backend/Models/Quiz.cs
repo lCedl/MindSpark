@@ -58,6 +58,7 @@ public class QuestionResponse
 {
     public int Id { get; set; }
     public string QuestionText { get; set; } = string.Empty;
+    public int CorrectAnswerId { get; set; }
     public List<AnswerResponse> Answers { get; set; } = new();
 }
 

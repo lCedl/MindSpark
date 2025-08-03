@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Review - MindSpark</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .quiz-info {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .quiz-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-meta {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .results-section {
+            margin-bottom: 2rem;
+        }
+
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .results-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .result-item {
+            background: #f8f9ff;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-player {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .result-score {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            background: #f8f9ff;
+            border-radius: 8px;
+        }
+
+        .questions-section {
+            margin-top: 2rem;
+        }
+
+        .questions-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .question-card {
+            background: #f8f9ff;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .answers-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .answer-item {
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .answer-item.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .answer-item.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .answer-text {
+            font-weight: 500;
+        }
+
+        .correct-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #fcc;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 1rem;
+            }
+
+            .result-item {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 Quiz Review</h1>
+            <p>Review questions and see previous results</p>
+        </div>
+
+        <div class="content">
+            <a href="/quiz_list" class="back-link">← Back to Quiz List</a>
+
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <div class="quiz-info">
+                <div class="quiz-title">{{ quiz.topic }}</div>
+                <div class="quiz-meta">{{ quiz.numberOfQuestions }} questions</div>
+            </div>
+
+            <div class="results-section">
+                <div class="results-title">📊 Previous Results</div>
+                {% if results %}
+                    <div class="results-list">
+                        {% for result in results %}
+                        <div class="result-item">
+                            <div class="result-player">{{ result.playerName }}</div>
+                            <div class="result-score">{{ result.score }}/{{ result.totalQuestions }} ({{ "%.1f"|format(result.percentage) }}%)</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <p>No one has taken this quiz yet. Be the first!</p>
+                        <a href="/quiz/{{ quiz.id }}" class="btn">🎯 Take This Quiz</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="questions-section">
+                <div class="questions-title">❓ Questions & Answers</div>
+                {% for question in quiz.questions %}
+                <div class="question-card">
+                    <div class="question-text">{{ loop.index }}. {{ question.questionText }}</div>
+                    <div class="answers-list">
+                        {% for answer in question.answers %}
+                        <div class="answer-item {% if answer.id == question.correctAnswerId %}correct{% endif %}">
+                            <span class="answer-text">{{ answer.answerText }}</span>
+                            {% if answer.id == question.correctAnswerId %}
+                            <span class="correct-badge">✓ Correct</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="/quiz/{{ quiz.id }}" class="btn">🎯 Take This Quiz Again</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
