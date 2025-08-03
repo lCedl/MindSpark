@@ -731,6 +731,7 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+sqlite/
 
 # Backup files
 *.bak
