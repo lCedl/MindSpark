@@ -21,7 +21,7 @@ spec:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
         - name: ASPNETCORE_URLS
-          value: "https://+:7001"
+          value: "http://+:7001"
         resources:
           requests:
             memory: "256Mi"
@@ -53,7 +53,7 @@ spec:
         - name: FLASK_ENV
           value: "production"
         - name: BACKEND_URL
-          value: "https://mindspark-backend-service:7001"
+          value: "http://mindspark-backend-service:7001"
         resources:
           requests:
             memory: "128Mi"

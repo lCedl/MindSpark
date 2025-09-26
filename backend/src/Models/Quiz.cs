@@ -89,4 +89,4 @@ public class QuizResultResponse
     public int TotalQuestions { get; set; }
     public double Percentage { get; set; }
     public DateTime CompletedAt { get; set; }
-} 
+}

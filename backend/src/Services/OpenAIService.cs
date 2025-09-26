@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Linq;
 using Backend.Models;
 
 namespace Backend.Services;
@@ -54,7 +55,6 @@ public class OpenAIService : IOpenAIService
         {
             model = "gpt-3.5-turbo",
             messages = new[]
-            
             {
                 new { role = "system", content = "You are a helpful assistant that creates educational quizzes. Always respond with valid JSON in the exact format requested." },
                 new { role = "user", content = prompt }
@@ -66,9 +66,8 @@ public class OpenAIService : IOpenAIService
         var jsonContent = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
-        // Retry logic for rate limits
         int maxRetries = 3;
-        int retryDelayMs = 2000; // Start with 2 seconds
+        int retryDelayMs = 2000;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++)
         {
@@ -87,7 +86,7 @@ public class OpenAIService : IOpenAIService
                         {
                             _logger.LogWarning($"Rate limit hit, attempt {attempt}/{maxRetries}. Waiting {retryDelayMs}ms before retry.");
                             await Task.Delay(retryDelayMs);
-                            retryDelayMs *= 2; // Exponential backoff
+                            retryDelayMs *= 2;
                             continue;
                         }
                         else
@@ -133,7 +132,6 @@ public class OpenAIService : IOpenAIService
                     throw new Exception($"Failed to parse quiz JSON from OpenAI response: {ex.Message}. Quiz JSON: {quizJson}");
                 }
 
-                // Convert to our domain model
                 var quiz = new Quiz
                 {
                     Topic = topic,
@@ -150,7 +148,6 @@ public class OpenAIService : IOpenAIService
                         Answers = new List<Answer>()
                     };
 
-                    // Add all answers and track which one is correct
                     int correctAnswerIndex = -1;
                     for (int i = 0; i < questionData.Answers.Count; i++)
                     {
@@ -166,8 +163,6 @@ public class OpenAIService : IOpenAIService
                         }
                     }
 
-                    // Store the correct answer index for later processing
-                    // We'll set the CorrectAnswerId after saving to get the actual IDs
                     question.CorrectAnswerId = correctAnswerIndex;
 
                     quiz.Questions.Add(question);
@@ -178,7 +173,7 @@ public class OpenAIService : IOpenAIService
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Error generating quiz with OpenAI");
-                throw; // Re-throw to preserve the original error details
+                throw;
             }
             catch (Exception ex)
             {
@@ -191,7 +186,6 @@ public class OpenAIService : IOpenAIService
     }
 }
 
-// OpenAI API response models
 public class OpenAIResponse
 {
     [JsonPropertyName("id")]
@@ -277,4 +271,4 @@ public class OpenAIAnswer
     
     [JsonPropertyName("isCorrect")]
     public bool IsCorrect { get; set; }
-} 
+}

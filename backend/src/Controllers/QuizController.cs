@@ -35,14 +35,11 @@ public class QuizController : ControllerBase
                 return BadRequest("Number of questions must be between 1 and 20");
             }
 
-            // Generate quiz using OpenAI
             var quiz = await _openAIService.GenerateQuizAsync(request.Topic, request.NumberOfQuestions);
 
-            // Save to database
             _context.Quizzes.Add(quiz);
             await _context.SaveChangesAsync();
 
-            // Now that we have the actual IDs, update the CorrectAnswerId for each question
             foreach (var question in quiz.Questions)
             {
                 if (question.CorrectAnswerId >= 0 && question.CorrectAnswerId < question.Answers.Count)
@@ -54,7 +51,6 @@ public class QuizController : ControllerBase
             
             await _context.SaveChangesAsync();
 
-            // Return response without correct answers
             var response = new QuizResponse
             {
                 Id = quiz.Id,
@@ -108,7 +104,7 @@ public class QuizController : ControllerBase
             {
                 Id = q.Id,
                 QuestionText = q.QuestionText,
-                CorrectAnswerId = q.CorrectAnswerId, // Include correct answer ID for review
+                CorrectAnswerId = q.CorrectAnswerId,
                 Answers = q.Answers.Select(a => new AnswerResponse
                 {
                     Id = a.Id,
@@ -140,7 +136,6 @@ public class QuizController : ControllerBase
                 return BadRequest("Player name is required");
             }
 
-            // Calculate score
             int score = 0;
             foreach (var answerSubmission in submission.Answers)
             {
@@ -151,7 +146,6 @@ public class QuizController : ControllerBase
                 }
             }
 
-            // Save result
             var result = new QuizResult
             {
                 QuizId = quiz.Id,
@@ -218,7 +212,7 @@ public class QuizController : ControllerBase
             Id = q.Id,
             Topic = q.Topic,
             NumberOfQuestions = q.NumberOfQuestions,
-            Questions = new List<QuestionResponse>() // Don't include questions in list view
+            Questions = new List<QuestionResponse>()
         }).ToList();
 
         return Ok(response);
@@ -240,7 +234,6 @@ public class QuizController : ControllerBase
                 return NotFound("Quiz not found");
             }
 
-            // Delete related data (Entity Framework will handle cascading)
             _context.Quizzes.Remove(quiz);
             await _context.SaveChangesAsync();
 
@@ -252,4 +245,4 @@ public class QuizController : ControllerBase
             return StatusCode(500, "Error deleting quiz. Please try again.");
         }
     }
-} 
+}

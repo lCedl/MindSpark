@@ -17,7 +17,6 @@ public class BackendContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure relationships
         modelBuilder.Entity<Quiz>()
             .HasMany(q => q.Questions)
             .WithOne(q => q.Quiz)

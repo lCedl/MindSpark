@@ -747,6 +747,23 @@ sqlite/gui/*
 ./sqlite/gui/
 ./sqlite/gui/*
 
+# SQLite program files and GUI (correct spelling with double 'l')
+sqllite/
+sqllite/*
+sqllite/GUI/
+sqllite/GUI/*
+./sqllite/
+./sqllite/*
+./sqllite/GUI/
+./sqllite/GUI/*
+
+# SQLite executables and libraries
+*.exe
+*.dll
+*.so
+*.dylib
+*.app
+
 # Backup files
 *.bak
 *.backup

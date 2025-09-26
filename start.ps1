@@ -8,7 +8,7 @@ Write-Host "Waiting for backend to start..." -ForegroundColor Cyan
 Start-Sleep -Seconds 5
 
 Write-Host "Starting Frontend (Flask) with virtual environment..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd frontend; .\venv\Scripts\Activate.ps1; python app.py"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd frontend; .\venv\Scripts\Activate.ps1; python src\app.py"
 
 Write-Host ""
 Write-Host "Services are starting..." -ForegroundColor Green
