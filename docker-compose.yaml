@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mindspark-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: mindspark/mindspark-backend:latest
+    container_name: mindspark-backend
+    ports:
+      - "7001:7001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:7001
+      - ConnectionStrings__DefaultConnection=Data Source=/app/sqlite/mindspark.db
+    volumes:
+      - mindspark-data:/app/sqlite
+    networks:
+      - mindspark-network
+    restart: unless-stopped
+
+  mindspark-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: mindspark/mindspark-frontend:latest
+    container_name: mindspark-frontend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - BACKEND_URL=http://mindspark-backend:7001
+    depends_on:
+      - mindspark-backend
+    networks:
+      - mindspark-network
+    restart: unless-stopped
+
+volumes:
+  mindspark-data:
+    driver: local
+
+networks:
+  mindspark-network:
+    driver: bridge

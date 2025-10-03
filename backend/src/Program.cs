@@ -32,6 +32,22 @@ public class Program
 
         var app = builder.Build();
 
+        // Ensure database is created and migrations are applied
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<BackendContext>();
+            try
+            {
+                context.Database.EnsureCreated();
+                context.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while migrating the database.");
+            }
+        }
+
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
@@ -48,6 +64,9 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        // Add health check endpoint
+        app.MapGet("/health", () => "OK");
 
         app.Run();
     }

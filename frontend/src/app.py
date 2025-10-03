@@ -2,11 +2,27 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import requests
 import json
 import os
+import time
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:5163")
+
+# Wait for backend to be ready (only in production/Docker)
+if os.environ.get("FLASK_ENV") == "production":
+    print("Waiting for backend to be ready...")
+    for i in range(30):  # Wait up to 30 seconds
+        try:
+            response = requests.get(f"{BACKEND_URL}/health", timeout=2)
+            if response.status_code == 200:
+                print("Backend is ready!")
+                break
+        except requests.exceptions.RequestException:
+            pass
+        time.sleep(1)
+    else:
+        print("Warning: Backend may not be ready yet")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

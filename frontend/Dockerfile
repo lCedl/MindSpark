@@ -7,8 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # copy src and templates separately to avoid copying venv etc.
 COPY src/ ./
-COPY templates/ ./templates/
 
 EXPOSE 5000
 
-CMD ["python", "src/app.py"]
+CMD ["python", "app.py"]
