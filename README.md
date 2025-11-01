@@ -183,6 +183,24 @@ The application uses Entity Framework with the following entities:
 docker-compose up -d
 ```
 
+### Kubernetes (Raspberry Pi)
+See comprehensive guides:
+- **Quick Start**: `QUICK_DEPLOY.md`
+- **Full Guide**: `K8S_DEPLOYMENT.md`
+- **ARM64 Build**: `BUILD_FOR_ARM.md`
+
+```bash
+# Build for ARM64 (Raspberry Pi)
+./build-for-pi.ps1  # Windows
+# OR
+./build-for-pi.sh   # Linux/Mac
+
+# Deploy to Kubernetes
+./deploy.ps1  # Windows
+# OR
+./deploy.sh   # Linux/Mac
+```
+
 ### Manual Deployment
 1. Deploy backend to Azure/AWS/your preferred platform
 2. Deploy frontend to a web server

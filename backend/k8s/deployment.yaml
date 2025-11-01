@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mindspark-backend
+  namespace: mindspark
   labels:
     app: mindspark-backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mindspark-backend
@@ -24,4 +25,18 @@ spec:
           value: "Production"
         - name: ASPNETCORE_URLS
           value: "http://+:7001"
+        - name: ConnectionStrings__DefaultConnection
+          value: "Data Source=/app/sqlite/mindspark.db"
+        - name: OpenAI__ApiKey
+          valueFrom:
+            secretKeyRef:
+              name: mindspark-secrets
+              key: OpenAI__ApiKey
+        volumeMounts:
+        - name: sqlite-data
+          mountPath: /app/sqlite
+      volumes:
+      - name: sqlite-data
+        persistentVolumeClaim:
+          claimName: mindspark-data
 
